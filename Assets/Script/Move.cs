@@ -18,6 +18,7 @@ public class Move : MonoBehaviour
 
     void Update()
     {
+
         //プレイヤーとゴールの座標の差が_stopDistance以下の場合移動を停止
         if (Vector3.Distance(transform.position, _goal.position) <= _stopDistance)
         {
@@ -25,7 +26,12 @@ public class Move : MonoBehaviour
         }
         else
         {
-            _rigidBody.velocity = transform.forward * _speed;
+            float horizontal = Input.GetAxis("Horizontal");
+            //左右移動の速度
+            Vector3 horizontalMove = transform.right * horizontal * _speed;
+            Vector3 forwardMove = transform.forward * _speed;
+            //ベクトルの合成
+            _rigidBody.velocity = forwardMove + horizontalMove;
         }
     }
     //https://candle-stoplight-544.notion.site/4e021f226d584730b715626436ccc330
