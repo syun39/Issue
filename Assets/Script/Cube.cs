@@ -15,4 +15,14 @@ public class Cube : MonoBehaviour
         _scoreController.GetComponent<ScoreController>().AddScore(1);
         Destroy(gameObject); //íœ
     }
+
+    //‰ñ“š—á
+    /*private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            ScoreManager.Instance.AddScore(1);
+            Destroy(gameObject);
+        }
+    }*/
 }
