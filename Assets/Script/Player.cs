@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     [SerializeField] int _speed = 50; //プレイヤーの速度
     [SerializeField] float _jumpPower = 10f; // ジャンプ力
     [SerializeField] int _maxLife = 5;
+    [SerializeField] int _lifeRecovery = 1; // 回復するライフの量
 
     private int _currentLife;
 
@@ -81,6 +82,19 @@ public class Player : MonoBehaviour
             Destroy(other.gameObject);
             FindObjectOfType<LifeController>().LifeText();
         }
+
+        else if (other.CompareTag("LifeItem"))
+        {
+            RecoverLife();
+            Destroy(other.gameObject);
+            FindObjectOfType<LifeController>().LifeText();
+        }
+    }
+
+    private void RecoverLife()
+    {
+        //最大ライフを超えないように
+        _currentLife = Mathf.Min(_currentLife + _lifeRecovery, _maxLife);
     }
 
     public int GetCurrentLife()
@@ -96,7 +110,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "Goal" && collision.gameObject.name == "GoalWall") //オブジェクトの名前があっていた時
+        if (collision.gameObject.name == "Goal" || collision.gameObject.name == "GoalWall") //オブジェクトの名前があっていた時
         {
             _rigidBody.velocity = Vector3.zero;
             SceneLoad("GameClear");
