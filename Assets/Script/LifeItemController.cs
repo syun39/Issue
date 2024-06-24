@@ -21,7 +21,7 @@ public class LifeItemController : MonoBehaviour
             Vector3 spawnPosition = new(randomX, _fixedYPos, randomZ);
 
             // キューブの生成
-            Instantiate(_lifeItemPrefab, spawnPosition, Quaternion.identity);
+            Instantiate(_lifeItemPrefab, spawnPosition, Quaternion.Euler(0, -180, 0));
 
         }
 
@@ -34,7 +34,7 @@ public class LifeItemController : MonoBehaviour
             Vector3 spawnPosition = new(randomX, _fixedYPos, randomZ);
 
             // キューブの生成
-            Instantiate(_lifeItemUpPrefab, spawnPosition, Quaternion.identity);
+            Instantiate(_lifeItemUpPrefab, spawnPosition, Quaternion.Euler(0, -180, 0));
         }
     }
 }

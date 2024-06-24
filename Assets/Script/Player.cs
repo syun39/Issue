@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -9,6 +10,11 @@ public class Player : MonoBehaviour
     [SerializeField] float _jumpPower = 10f; // ジャンプ力
     [SerializeField] int _maxLife = 5;
     [SerializeField] int _lifeRecovery = 1; // 回復するライフの量
+    [SerializeField] int _lifeRecoveryUp = 2; // 回復するライフの量
+    [SerializeField] float _invincibleTime = 5.0f; // 無敵モードの持続時間
+    [SerializeField] Text _invincibleText; // 無敵状態の残り時間を表示するテキスト
+    [SerializeField] AudioClip _invincibleBGM; // 無敵状態時のBGM
+    [SerializeField] AudioClip _normalBGM; // 通常時のBGM
 
     private int _currentLife;
 
@@ -18,6 +24,12 @@ public class Player : MonoBehaviour
 
     private string _inputBuffer = "";
 
+    private bool _isInvincible;
+
+    private float _invincibilityTimer;
+
+    private AudioSource _audioSource;
+
     //bool _isStop = false;
 
     void Awake()
@@ -25,6 +37,12 @@ public class Player : MonoBehaviour
         _rigidBody = GetComponent<Rigidbody>();
         _currentLife = _maxLife;
         _isMove = false;
+        _isInvincible = false;
+        _invincibilityTimer = 0.0f;
+        _invincibleText.gameObject.SetActive(false); // 無敵状態のテキストを非表示にする
+        _audioSource = GetComponent<AudioSource>();
+        _audioSource.clip = _normalBGM;
+        _audioSource.Play();
     }
 
     void Update()
@@ -60,6 +78,21 @@ public class Player : MonoBehaviour
 
             CheckForMikuInput();
         }
+
+        // 無敵モードの時間をカウントダウン
+        if (_isInvincible)
+        {
+            _invincibilityTimer -= Time.deltaTime;
+            if (_invincibilityTimer <= 0)
+            {
+                NoActivateInvincible();
+            }
+
+            else
+            {
+                _invincibleText.text = "無敵時間" + _invincibilityTimer.ToString("F1");
+            }
+        }
     }
 
     private void Jump()
@@ -72,11 +105,14 @@ public class Player : MonoBehaviour
     {
         if (other.CompareTag("Obstacle"))
         {
-            _currentLife--;
-
-            if (_currentLife == 0)
+            if (!_isInvincible)
             {
-                SceneLoad("GameScene");
+                _currentLife--;
+
+                if (_currentLife == 0)
+                {
+                    SceneLoad("GameScene");
+                }
             }
 
             Destroy(other.gameObject);
@@ -89,12 +125,31 @@ public class Player : MonoBehaviour
             Destroy(other.gameObject);
             FindObjectOfType<LifeController>().LifeText();
         }
+
+        else if (other.CompareTag("LifeItemUp"))
+        {
+            RecoverLifeUp();
+            Destroy(other.gameObject);
+            FindObjectOfType<LifeController>().LifeText();
+        }
+
+        else if (other.CompareTag("Invincible"))
+        {
+            ActivateInvincible();
+            Destroy(other.gameObject);
+        }
     }
 
     private void RecoverLife()
     {
         //最大ライフを超えないように
         _currentLife = Mathf.Min(_currentLife + _lifeRecovery, _maxLife);
+    }
+    //回復量が2のやつ
+    private void RecoverLifeUp()
+    {
+        //最大ライフを超えないように
+        _currentLife = Mathf.Min(_currentLife + _lifeRecoveryUp, _maxLife);
     }
 
     public int GetCurrentLife()
@@ -144,5 +199,22 @@ public class Player : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void ActivateInvincible()
+    {
+        _isInvincible = true;
+        _invincibilityTimer = _invincibleTime;
+        _invincibleText.gameObject.SetActive(true); // 無敵状態のテキストを表示する
+        _audioSource.clip = _invincibleBGM;
+        _audioSource.Play();
+    }
+
+    private void NoActivateInvincible()
+    {
+        _isInvincible = false;
+        _invincibleText.gameObject.SetActive(false); // 無敵状態のテキストを非表示にする
+        _audioSource.clip = _normalBGM;
+        _audioSource.Play();
     }
 }

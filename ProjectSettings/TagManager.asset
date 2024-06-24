@@ -7,6 +7,9 @@ TagManager:
   - Cube
   - Obstacle
   - Ground
+  - LifeItem
+  - LifeItemUp
+  - Invincible
   layers:
   - Default
   - TransparentFX
