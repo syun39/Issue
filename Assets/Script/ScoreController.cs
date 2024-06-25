@@ -4,17 +4,19 @@ using UnityEngine.UI;
 public class ScoreController : MonoBehaviour
 {
     [SerializeField] int _score; //スコア
-    [SerializeField] Text _text;
+    [SerializeField] Text _scoreText; // スコアテキスト
     void Start()
     {
         _score = 0;
     }
     void Update()
     {
-        _text.text = _score.ToString();
+        _scoreText.text = _score.ToString();
     }
-
-    //スコアを加算
+    /// <summary>
+    ///  //スコアを加算
+    /// </summary>
+    /// <param name="value"></param>
     public void AddScore(int value)
     {
         _score += value;

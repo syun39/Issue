@@ -3,23 +3,20 @@ using UnityEngine.UI;
 
 public class LifeController : MonoBehaviour
 {
-    [SerializeField] Text lifeText; // UI テキストオブジェクトへの参照
+    [SerializeField] Text _lifeText; // 残りライフテキスト
 
     void Start()
     {
-        LifeText(); // 最初にテキストを更新する
+        LifeText();
     }
 
-    // テキストを更新するメソッド
+    /// <summary>
+    /// テキストを更新する
+    /// </summary>
     public void LifeText()
     {
-        // プレイヤーコントローラーを探して参照する
-        var playerController = FindObjectOfType<Player>();
-
-        // プレイヤーコントローラーが見つかった場合にのみ残りライフを表示する
-        if (playerController != null)
-        {
-            lifeText.text = "Life " + playerController.GetCurrentLife().ToString(); // テキストに残りライフを表示
-        }
+        // プレイヤークラスを探す
+        var player = FindObjectOfType<Player>();
+        _lifeText.text = "Life " + player.GetCurrentLife().ToString(); // テキストに残りライフを表示
     }
 }

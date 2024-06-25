@@ -1,14 +1,16 @@
 using UnityEngine;
 
-public class Cube : MonoBehaviour
+public class Coin : MonoBehaviour
 {
-    [SerializeField] ScoreController _scoreController;
+    [SerializeField] GameObject _scoreController;
   
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            //ScoreControllerオブジェクトについてるScriptのメソッドを使用
+            // スコアコントローラクラスを探す
+            var _scoreController = FindObjectOfType<ScoreController>();
+            // スコアを1加算
             _scoreController.AddScore(1);
             Destroy(gameObject); //削除
         }
