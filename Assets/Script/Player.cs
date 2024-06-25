@@ -14,6 +14,10 @@ public class Player : MonoBehaviour
     [SerializeField] float _invincibleTime = 5.0f; // 無敵モードの持続時間
     [SerializeField] Text _invincibleText; // 無敵状態の残り時間を表示するテキスト
     [SerializeField] Text _startText; // スタートキーを表示するテキスト
+    [SerializeField] Text _secretText; // スピードが早くなる文字があると表示するテキスト
+    [SerializeField] Text _tipText; // ヒントを表示するテキスト
+    [SerializeField] Text _moveText; // 移動の仕方を表示するテキスト
+    [SerializeField] Text _jumpText; // ジャンプの仕方を表示するテキスト
     [SerializeField] Button _retireButton; // リタイアするボタン
     [SerializeField] AudioClip _invincibleBGM; // 無敵状態時のBGM
     [SerializeField] AudioClip _normalBGM; // 通常時のBGM
@@ -47,6 +51,10 @@ public class Player : MonoBehaviour
         _isInvincible = false;
         _invincibilityTimer = 0.0f;
         _invincibleText.gameObject.SetActive(false); // 無敵状態のテキストを非表示にする
+        _secretText.gameObject.SetActive(false);
+        _tipText.gameObject.SetActive(false);
+        _jumpText.gameObject.SetActive(true);
+        _moveText.gameObject.SetActive(true);
         _audioSource = GetComponent<AudioSource>();
         _audioSource.clip = _normalBGM;
         _audioSource.loop = true; // 通常時のBGMをループさせる
@@ -74,6 +82,10 @@ public class Player : MonoBehaviour
         if (_isMove)
         {
             _startText.gameObject.SetActive(false);
+            _secretText.gameObject.SetActive(true);
+            _tipText.gameObject.SetActive(true);
+            _jumpText.gameObject.SetActive(false);
+            _moveText.gameObject.SetActive(false);
             float horizontal = Input.GetAxis("Horizontal");
             //左右移動の速度
             Vector3 horizontalMove = transform.right * horizontal * _speed;
