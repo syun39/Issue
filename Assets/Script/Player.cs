@@ -13,8 +13,15 @@ public class Player : MonoBehaviour
     [SerializeField] int _lifeRecoveryUp = 2; // 回復するライフの量
     [SerializeField] float _invincibleTime = 5.0f; // 無敵モードの持続時間
     [SerializeField] Text _invincibleText; // 無敵状態の残り時間を表示するテキスト
+    [SerializeField] Text _startText; // スタートキーを表示するテキスト
+    [SerializeField] Button _retireButton; // リタイアするボタン
     [SerializeField] AudioClip _invincibleBGM; // 無敵状態時のBGM
     [SerializeField] AudioClip _normalBGM; // 通常時のBGM
+    [SerializeField] AudioClip _coinSe;
+    [SerializeField] AudioClip _obstacleSe;
+    [SerializeField] AudioClip _lifeRecoverySe;
+    [SerializeField] AudioClip _invincibleSe;
+    [SerializeField] AudioClip _jumpSe;
 
     private int _currentLife;
 
@@ -22,7 +29,7 @@ public class Player : MonoBehaviour
 
     private bool _isMove;
 
-    private string _inputBuffer = "";
+    private string _inputMozi = "";
 
     private bool _isInvincible;
 
@@ -42,7 +49,9 @@ public class Player : MonoBehaviour
         _invincibleText.gameObject.SetActive(false); // 無敵状態のテキストを非表示にする
         _audioSource = GetComponent<AudioSource>();
         _audioSource.clip = _normalBGM;
+        _audioSource.loop = true; // 通常時のBGMをループさせる
         _audioSource.Play();
+        _retireButton.gameObject.SetActive(false);
     }
 
     void Update()
@@ -64,6 +73,7 @@ public class Player : MonoBehaviour
 
         if (_isMove)
         {
+            _startText.gameObject.SetActive(false);
             float horizontal = Input.GetAxis("Horizontal");
             //左右移動の速度
             Vector3 horizontalMove = transform.right * horizontal * _speed;
@@ -76,7 +86,9 @@ public class Player : MonoBehaviour
                 Jump();
             }
 
-            CheckForMikuInput();
+            _retireButton.gameObject.SetActive(true);
+
+            CheckForInput();
         }
 
         // 無敵モードの時間をカウントダウン
@@ -97,6 +109,7 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
+        _audioSource.PlayOneShot(_jumpSe);
         _rigidBody.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);
         _isGround = false;
     }
@@ -108,6 +121,7 @@ public class Player : MonoBehaviour
             if (!_isInvincible)
             {
                 _currentLife--;
+                _audioSource.PlayOneShot(_obstacleSe);
 
                 if (_currentLife == 0)
                 {
@@ -119,9 +133,15 @@ public class Player : MonoBehaviour
             FindObjectOfType<LifeController>().LifeText();
         }
 
+        else if (other.CompareTag("Coin"))
+        {
+            _audioSource.PlayOneShot(_coinSe);
+        }
+
         else if (other.CompareTag("LifeItem"))
         {
             RecoverLife();
+            _audioSource.PlayOneShot(_lifeRecoverySe);
             Destroy(other.gameObject);
             FindObjectOfType<LifeController>().LifeText();
         }
@@ -129,12 +149,14 @@ public class Player : MonoBehaviour
         else if (other.CompareTag("LifeItemUp"))
         {
             RecoverLifeUp();
+            _audioSource.PlayOneShot(_lifeRecoverySe);
             Destroy(other.gameObject);
             FindObjectOfType<LifeController>().LifeText();
         }
 
         else if (other.CompareTag("Invincible"))
         {
+            _audioSource.PlayOneShot(_invincibleSe);
             ActivateInvincible();
             Destroy(other.gameObject);
         }
@@ -177,22 +199,27 @@ public class Player : MonoBehaviour
         }
     }
 
-
-    private void CheckForMikuInput()
+    //入力文字チェック
+    private void CheckForInput()
     {
         if (Input.anyKeyDown)
         {
+            //押された文字列を取得
             foreach (char c in Input.inputString)
             {
+                //アルファベットかどうか
                 if (char.IsLetter(c))
                 {
-                    _inputBuffer += char.ToLower(c);
-                    if (_inputBuffer.Length > 4)
+                    _inputMozi += char.ToLower(c); //文字を小文字に変換
+
+                    //四文字だけを保持
+                    if (_inputMozi.Length > 4)
                     {
-                        _inputBuffer = _inputBuffer.Substring(_inputBuffer.Length - 4);
+                        _inputMozi = _inputMozi.Substring(_inputMozi.Length - 4);
                     }
 
-                    if (_inputBuffer.Equals("miku"))
+                    //四文字が一致したら
+                    if (_inputMozi.Equals("miku"))
                     {
                         _speed *= 3;
                     }
@@ -207,6 +234,7 @@ public class Player : MonoBehaviour
         _invincibilityTimer = _invincibleTime;
         _invincibleText.gameObject.SetActive(true); // 無敵状態のテキストを表示する
         _audioSource.clip = _invincibleBGM;
+        _audioSource.loop = false; // 無敵状態のBGMをループしない
         _audioSource.Play();
     }
 
@@ -215,6 +243,7 @@ public class Player : MonoBehaviour
         _isInvincible = false;
         _invincibleText.gameObject.SetActive(false); // 無敵状態のテキストを非表示にする
         _audioSource.clip = _normalBGM;
+        _audioSource.loop = true; // 通常時のBGMをループする
         _audioSource.Play();
     }
 }

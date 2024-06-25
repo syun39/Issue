@@ -3,7 +3,7 @@ using UnityEngine;
 public class Cube : MonoBehaviour
 {
     [SerializeField] ScoreController _scoreController;
-
+  
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
